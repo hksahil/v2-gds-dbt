@@ -1,7 +1,13 @@
--- models/staging/stg_regions.sql
-with source as (select * from {{ source('tpch', 'REGION') }})
-select
-    R_REGIONKEY as region_key,
-    R_NAME      as region_name,
-    R_COMMENT   as region_comment
+with source as (
+select * from {{source('tpch','region')}}
+),
+
+renamed as (
+    select 
+    r_regionkey as region_key,
+    r_name as region_name,
+    r_comment as region_comment
 from source
+)
+
+select * from renamed

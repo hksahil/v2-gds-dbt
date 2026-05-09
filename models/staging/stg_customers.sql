@@ -1,17 +1,18 @@
--- models/staging/stg_customers.sql
 with source as (
-    select * from {{ source('tpch', 'CUSTOMER') }}
+select * from {{source('tpch','customer')}}
 ),
+
 renamed as (
-    select
-        C_CUSTKEY       as customer_key,
-        C_NAME          as customer_name,
-        C_ADDRESS       as customer_address,
-        C_NATIONKEY     as nation_key,
-        C_PHONE         as phone_number,
-        C_ACCTBAL       as account_balance,
-        C_MKTSEGMENT    as market_segment,
-        C_COMMENT       as customer_comment
-    from source
+    select 
+    c_custkey as customer_key,
+    c_name as customer_name,
+    c_address as customer_adress,
+    c_nationkey as nation_key,
+    c_phone as phone_number,
+    c_acctbal as account_balance,
+    c_mktsegment as market_segment,
+    c_comment as customer_comment
+from source
 )
+
 select * from renamed

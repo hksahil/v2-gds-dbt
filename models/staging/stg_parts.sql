@@ -1,18 +1,19 @@
--- models/staging/stg_parts.sql
 with source as (
-    select * from {{ source('tpch', 'PART') }}
+select * from {{source('tpch','part')}}
 ),
+
 renamed as (
-    select
-        P_PARTKEY       as part_key,
-        P_NAME          as part_name,
-        P_MFGR          as manufacturer,
-        P_BRAND         as brand,
-        P_TYPE          as part_type,
-        P_SIZE          as part_size,
-        P_CONTAINER     as container_type,
-        P_RETAILPRICE   as retail_price,
-        P_COMMENT       as part_comment
-    from source
+    select 
+    p_partkey as part_key,
+    p_name as part_name,
+    p_mfgr as manufacturer,
+    p_brand as brand,
+    p_type as part_type,
+    p_size as part_size,
+    p_container container_type,
+    p_retailprice as retail_price,
+    p_comment as part_comment
+from source
 )
+
 select * from renamed

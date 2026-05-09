@@ -2,62 +2,23 @@ version: 2
 
 sources:
   - name: tpch
-    description: 'TPCH sample data hosted in Snowflake. Models a global supply-chain e-commerce.'
+    description: 'tpch sample data hosted in snowflake'
     database: SNOWFLAKE_SAMPLE_DATA
     schema: TPCH_SF1
     tables:
-      - name: CUSTOMER
-        description: 'Customer master table.'
-        columns:
-          - name: C_CUSTKEY
-            description: 'Primary key for customer.'
-            tests: [unique, not_null]
-          - name: C_NATIONKEY
-            description: 'FK to NATION table.'
-            tests: [not_null]
-          - name: C_MKTSEGMENT
-            description: 'Market segment (AUTOMOBILE, BUILDING, FURNITURE, MACHINERY, HOUSEHOLD).'
-
-      - name: ORDERS
-        description: 'Order header records.'
-        columns:
-          - name: O_ORDERKEY
-            tests: [unique, not_null]
-          - name: O_CUSTKEY
-            tests: [not_null]
-          - name: O_ORDERSTATUS
-
-      - name: LINEITEM
-        description: 'Individual line items per order — the primary fact grain.'
-        columns:
-          - name: L_ORDERKEY
-            tests: [not_null]
-          - name: L_LINENUMBER
-            tests: [not_null]
-
-      - name: PART
-        columns:
-          - name: P_PARTKEY
-            tests: [unique, not_null]
-
-      - name: SUPPLIER
-        columns:
-          - name: S_SUPPKEY
-            tests: [unique, not_null]
-
-      - name: PARTSUPP
-        columns:
-          - name: PS_PARTKEY
-            tests: [not_null]
-          - name: PS_SUPPKEY
-            tests: [not_null]
-
-      - name: NATION
-        columns:
-          - name: N_NATIONKEY
-            tests: [unique, not_null]
-
-      - name: REGION
-        columns:
-          - name: R_REGIONKEY
-            tests: [unique, not_null]
+      - name: customer
+        description: 'Customer master table'
+      - name: lineitem
+        description: 'Individual lines present in order'
+      - name: nation
+        description: 'Nation master data'
+      - name: orders
+        description: 'Transaction table present at order granuality'
+      - name: part
+        description: 'Item Parts master table'
+      - name: partsupp
+        description: 'Parts supplied and their metadata'
+      - name: supplier
+        description: 'Supplier master table'
+      - name: region
+        description: 'Region master table'

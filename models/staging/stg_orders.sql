@@ -1,21 +1,21 @@
--- models/staging/stg_orders.sql
 with source as (
-    select * from {{ source('tpch', 'ORDERS') }}
+select * from {{source('tpch','orders')}}
 ),
+
 renamed as (
-    select
-        O_ORDERKEY          as order_key,
-        O_CUSTKEY           as customer_key,
-        O_ORDERSTATUS       as order_status,
-        O_TOTALPRICE        as order_total_price,
-        O_ORDERDATE         as order_date,
-        O_ORDERPRIORITY     as order_priority,
-        O_CLERK             as clerk_name,
-        O_SHIPPRIORITY      as ship_priority,
-        O_COMMENT           as order_comment,
-        -- derived
-        year(O_ORDERDATE)   as order_year,
-        month(O_ORDERDATE)  as order_month
-    from source
+    select 
+    o_orderkey as order_key,
+    o_custkey as customer_key,
+    o_orderstatus as order_status,
+    o_totalprice as order_total_price,
+    o_orderdate as order_date,
+    o_orderpriority as order_priority,
+    o_clerk as clerk_name,
+    o_shippriority as ship_priority,
+    o_comment as order_comment,
+    year(o_orderdate) as order_year,
+    month(o_orderdate) as order_month,
+from source
 )
+
 select * from renamed

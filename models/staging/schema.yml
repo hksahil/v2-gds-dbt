@@ -1,0 +1,174 @@
+version: 2
+
+models:
+  - name: stg_orders
+    description: Staging model for customer orders
+
+    tests:
+      # 1. Row count must be between 1 and 1,000,000
+      - dbt_expectations.expect_table_row_count_to_be_between:
+          arguments:
+            min_value: 1
+            max_value: 1000000
+
+      # 2. Exact column list (order matters!)
+      - dbt_expectations.expect_table_columns_to_match_ordered_list:
+          arguments:
+            column_list:
+              - order_id
+              - customer_id
+              - order_date
+              - product_name
+              - quantity
+              - unit_price
+              - total_amount
+              - status
+              - region
+              - phone
+              - email
+
+      # 3. Row count must equal another model
+      - dbt_expectations.expect_table_row_count_to_equal_other_table:
+          arguments:
+            compare_model: ref('stg_orders_bkp')
+
+    columns:
+      # ── order_id ──────────────────────────────────────────────
+      - name: order_id
+        description: Unique identifier for each order
+        tests:
+          - dbt_expectations.expect_column_to_exist
+          - dbt_expectations.expect_column_values_to_be_unique
+          - dbt_expectations.expect_column_values_to_not_be_null
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              arguments:
+                column_type: bigint
+
+      # ── customer_id ───────────────────────────────────────────
+      - name: customer_id
+        description: Customer identifier
+        tests:
+          - dbt_expectations.expect_column_values_to_not_be_null
+          - dbt_expectations.expect_column_values_to_match_regex:
+              arguments:
+                regex: "^C[0-9]{3}$"
+          - dbt_expectations.expect_column_proportion_of_unique_values_to_be_between:
+              arguments:
+                min_value: 0.1
+                max_value: 1.0
+
+      # ── order_date ────────────────────────────────────────────
+      - name: order_date
+        description: Date when the order was placed
+        tests:
+          - dbt_expectations.expect_column_values_to_not_be_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              arguments:
+                min_value: "'2020-01-01'"
+                max_value: "current_date"
+
+      # ── quantity ──────────────────────────────────────────────
+      - name: quantity
+        description: Number of units ordered
+        tests:
+          - dbt_expectations.expect_column_values_to_not_be_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              arguments:
+                min_value: 1
+                max_value: 10000
+                strictly: false
+          - dbt_expectations.expect_column_mean_to_be_between:
+              arguments:
+                min_value: 1
+                max_value: 20
+          - dbt_expectations.expect_column_stdev_to_be_between:
+              arguments:
+                min_value: 0
+                max_value: 50
+
+      # ── unit_price ────────────────────────────────────────────
+      - name: unit_price
+        description: Price per unit in USD
+        tests:
+          - dbt_expectations.expect_column_values_to_not_be_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              arguments:
+                min_value: 0
+                max_value: 100000
+                strictly: false
+          - dbt_expectations.expect_column_mean_to_be_between:
+              arguments:
+                min_value: 5
+                max_value: 5000
+
+      # ── total_amount ──────────────────────────────────────────
+      - name: total_amount
+        description: quantity x unit_price
+        tests:
+          - dbt_expectations.expect_column_values_to_not_be_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              arguments:
+                min_value: 0
+                max_value: 999999
+                strictly: true
+
+      # ── status ────────────────────────────────────────────────
+      - name: status
+        description: Order fulfillment status
+        tests:
+          - dbt_expectations.expect_column_values_to_not_be_null
+          - dbt_expectations.expect_column_values_to_be_in_set:
+              arguments:
+                value_set:
+                  - pending
+                  - shipped
+                  - completed
+                  - cancelled
+                  - returned
+          - dbt_expectations.expect_column_values_to_be_in_set:
+              arguments:
+                value_set: ["completed"]
+                mostly: 0.3
+                row_condition: "status is not null"
+
+      # ── region ────────────────────────────────────────────────
+      - name: region
+        description: Geographic region of the order
+        tests:
+          - dbt_expectations.expect_column_values_to_not_be_null
+          - dbt_expectations.expect_column_values_to_be_in_set:
+              arguments:
+                value_set:
+                  - North
+                  - South
+                  - East
+                  - West
+          - dbt_expectations.expect_column_values_to_match_regex:
+              arguments:
+                regex: '^[A-Z]'
+
+      # ── phone ─────────────────────────────────────────────────
+      - name: phone
+        description: Customer phone number
+        tests:
+          - dbt_expectations.expect_column_to_exist
+          - dbt_expectations.expect_column_values_to_not_be_null
+          - dbt_expectations.expect_column_values_to_match_regex:
+              arguments:
+                regex: '^\+[1-9][0-9\-]{7,18}$'
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              arguments:
+                column_type: varchar
+
+      # ── email ─────────────────────────────────────────────────
+      - name: email
+        description: Customer email address
+        tests:
+          - dbt_expectations.expect_column_to_exist
+          - dbt_expectations.expect_column_values_to_not_be_null
+          - dbt_expectations.expect_column_values_to_match_regex:
+              arguments:
+                regex: '^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$'
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              arguments:
+                column_type: varchar
